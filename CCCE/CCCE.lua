@@ -82,3 +82,46 @@ for lineNr = 1, #lines do
   end
 end
 --Execute the code!
+FuncStack = 0
+LoopStack = 0
+for line=1,#Compiled do
+  if string.sub(Compiled[line],1,9) == "shell.run" then
+    printError("CCCE has halted the running program beacuse it wants to execute")
+    printError(Compiled[line])
+    printError("How do you wish to continue?")
+    printError("1. Run in foreground (CCCE cant halt it while it runs)")
+    printError("2. Run in background (CCCE cant halt it while it runs)")
+    printError("3. Attempt to force CCCE to run it via the API")
+    sel = read()
+    if sel == "3" then
+      shell.run("CCCE API",string.sub(Compiled[line],12,string.len(Compiled[line])-3))
+    elseif sel == "2" then
+      shell.run("bg",string.sub(Compiled[line],12,string.len(Compiled[line])-3))
+    else
+      os.execute(Compiled[line])
+    end
+  elseif string.sub(Compiled[line],1,6) == "return" then
+    if FuncStack == 0 then
+      printError("The code has finnished running")
+      printError("Thank you for useing CCCE")
+    else
+      printError("Currently CCCE does not support returns in functions ):")
+      sleep(1)
+    end
+  elseif string.sub(Compiled[line],1,11) == "os.shutdown" then
+    printError("The code called a shutdown command")
+    printError("so CCCE will now exit")
+  elseif string.sub(Compiled[line],1,9) == "os.reboot" then
+    printError("The code called a reboot command")
+    printError("so CCCE will now exit")
+  elseif string.sub(Compiled[line],1,8) == "function" then
+    printError("Currently CCCE does not support functions properly ):")
+    printError("NOTICE: The code is now likely to crash")
+    sleep(3)
+  elseif string.sub(Compiled[line],1,3) == "for" or string.sub(Compiled[line],1,5) == "while" then
+    printError("Currently CCCE does not support loops ):")
+    printError("The code is likely to crash")
+  else
+    os.execute(Compiled[line])
+  end
+end
